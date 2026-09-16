@@ -23,6 +23,15 @@ ports:
     protocol: tcp
     name: web
 
+# `dsh web` only binds 127.0.0.1, while the runtime forwards the published port
+# to the sandbox's external addresses, so a relay bridges the two.
+setup:
+  startup:
+    - command: ["node", "/home/agent/.dsh/sbx-relay.js"]
+      user: "1000"
+      background: true
+      description: Relay the published port to the loopback-bound dsh web server
+
 permissions:
   network:
     allow:

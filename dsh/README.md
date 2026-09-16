@@ -48,12 +48,27 @@ From a Git repo, once pushed:
 sbx run --kit "git+https://github.com/JLugagne/sbx-kits.git#dir=dsh" dsh
 ```
 
-The entrypoint runs `dsh web --no-open` by default; port `3080` is
-published, so open `http://localhost:3080` on the host once the sandbox is
-running. Interactive attach (`command.interactive: []`) runs `dsh web` with
-no extra args, which opens a browser from inside the sandbox — harmless but
-unnecessary there, so `--no-open` on the default path is the one that
-matters for headless/detached runs.
+The entrypoint runs `dsh web --no-open` by default. Interactive attach
+(`command.interactive: []`) runs `dsh web` with no extra args, which opens a
+browser from inside the sandbox — harmless but unnecessary there, so
+`--no-open` on the default path is the one that matters for headless/detached
+runs.
+
+## Reaching the Web UI from the host
+
+`dsh web` only binds `127.0.0.1` (it refuses `0.0.0.0` on purpose), while the
+sandbox runtime forwards a published host port to the sandbox's external
+addresses. The kit therefore ships `files/home/.dsh/sbx-relay.js` and starts
+it with `setup.startup`: it listens on the sandbox interfaces and pipes every
+connection to the loopback web server. Without it, the published port accepts
+the TCP connection and then resets it (the runtime's dial to the sandbox
+address is refused).
+
+The host port is ephemeral, so read it from `sbx ls` / `sbx ports <name>`
+(or pin it explicitly, e.g. `sbx ports <name> --publish 127.0.0.1:32772:3080`).
+The first visit needs the tokenized URL that `dsh web` prints at startup
+(`dsh web: http://127.0.0.1:3080/?token=…`); the token mints a signed cookie,
+and any later visit to the same `host:port` authority works without it.
 
 ## Telemetry — what's disabled and why
 
