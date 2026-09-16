@@ -19,7 +19,9 @@ sandbox:
 
 # Publishes the Web UI port so `sbx run` can forward it to the host.
 ports:
-  - 3080
+  - container: 3080
+    protocol: tcp
+    name: web
 
 permissions:
   network:
