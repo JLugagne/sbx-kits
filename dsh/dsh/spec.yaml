@@ -1,0 +1,46 @@
+schemaVersion: "2"
+kind: sandbox
+name: dsh
+displayName: DeepSeek Harness
+description: >-
+  DeepSeek Harness (dsh) — https://github.com/deepseek-ai/deepseek-harness —
+  running inside a Docker Sandbox, with built-in telemetry disabled and the
+  telemetry collector's domain explicitly denied at the network layer.
+
+sandbox:
+  image: ghcr.io/JLugagne/dsh-sbx-kit:latest
+  entrypoint: ["dsh", "--profile", "web"]
+  command:
+    default: ["--no-open"]
+    interactive: []
+  resources:
+    cpu: 2.0
+    memory: 4g
+
+# Publishes the Web UI port so `sbx run` can forward it to the host.
+ports:
+  - 3080
+
+permissions:
+  network:
+    allow:
+      # DeepSeek's model API (also used for the optional search tool)
+      - api.deepseek.com
+    deny:
+      # Belt-and-suspenders: even if DSH_TELEMETRY_DISABLED were ever
+      # unset or ignored, this host cannot be reached from the sandbox.
+      - harness-telemetry.deepseeksvc.com
+
+environment:
+  variables:
+    DSH_TELEMETRY_DISABLED: "1"
+    DSH_TELEMETRY_MODE: "DISABLED"
+
+credentials:
+  - service: deepseek
+    description: "DeepSeek API key, used by dsh for model calls (and the optional web-search tool)"
+    apiKey:
+      name: DEEPSEEK_API_KEY
+      inject:
+        - domain: api.deepseek.com
+          scheme: bearer

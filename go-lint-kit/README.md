@@ -15,11 +15,11 @@ Locally:
 
 From a Git repo (once pushed to GitHub):
 
-    sbx run --kit "git+https://github.com/JLugagne/sbx-kit.git#dir=go-lint-kit" claude
+    sbx run --kit "git+https://github.com/JLugagne/sbx-kits.git#dir=go-lint-kit" claude
 
 Pin a tag/commit for production use:
 
-    sbx run --kit "git+https://github.com/JLugagne/sbx-kit.git#ref=v1.0.0&dir=go-lint-kit" claude
+    sbx run --kit "git+https://github.com/JLugagne/sbx-kits.git#ref=v1.0.0&dir=go-lint-kit" claude
 
 ## Extending a specific agent
 
