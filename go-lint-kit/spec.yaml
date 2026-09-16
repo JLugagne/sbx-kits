@@ -1,0 +1,57 @@
+schemaVersion: "1"
+kind: mixin
+name: go-lint-kit
+displayName: Go Lint Kit
+description: >-
+  Installs the latest Go toolchain, golangci-lint (Go meta-linter),
+  go-arch-lint (architecture linter) and diffity (diff viewer / code
+  review tool) into the sandbox.
+
+# Complete network contract required by the install commands below.
+# Any domain not listed here is blocked under a deny-all policy.
+network:
+  allowedDomains:
+    # fetching and downloading Go
+    - go.dev
+    - dl.google.com
+    # go install (Go module proxy) — used for golangci-lint and go-arch-lint
+    - proxy.golang.org
+    - sum.golang.org
+    - storage.googleapis.com
+    # diffity (npm registry)
+    - registry.npmjs.org
+
+environment:
+  variables:
+    GOPATH: "/home/agent/go"
+    PATH: "$PATH:/home/agent/.local/go/bin:/home/agent/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+commands:
+  install:
+    - command: |
+        set -eu
+        GO_VERSION="$(curl -fsSL 'https://go.dev/VERSION?m=text' | head -n1)"
+        curl -fsSL "https://go.dev/dl/${GO_VERSION}.linux-amd64.tar.gz" -o /tmp/go.tgz
+        mkdir -p "$HOME/.local"
+        rm -rf "$HOME/.local/go"
+        tar -C "$HOME/.local" -xzf /tmp/go.tgz
+        rm -f /tmp/go.tgz
+        "$HOME/.local/go/bin/go" version
+      user: "1000"
+      description: "Install the latest Go version into ~/.local/go"
+
+    - command: |
+        set -eu
+        go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+      user: "1000"
+      description: "Install golangci-lint (via go install, module proxy only)"
+
+    - command: |
+        set -eu
+        go install github.com/fe3dback/go-arch-lint@latest
+      user: "1000"
+      description: "Install go-arch-lint"
+
+    - command: "npm install -g diffity"
+      user: "1000"
+      description: "Install diffity (diff viewer / code review tool)"
