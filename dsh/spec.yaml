@@ -8,7 +8,7 @@ description: >-
   telemetry collector's domain explicitly denied at the network layer.
 
 sandbox:
-  image: ghcr.io/JLugagne/dsh-sbx-kit:latest
+  image: ghcr.io/jlugagne/dsh-sbx-kit:latest
   entrypoint: ["dsh", "--profile", "web"]
   command:
     default: ["--no-open"]

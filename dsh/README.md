@@ -17,10 +17,10 @@ scratch: its own image, entrypoint, and network policy.
 `sbx` doesn't build the Dockerfile itself.
 
 ```bash
-docker build -t docker.io/JLugagne/dsh-sbx-kit:latest --push .
+docker build -t ghcr.io/jlugagne/dsh-sbx-kit:latest --push .
 ```
 
-Then edit `spec.yaml` and replace `docker.io/JLugagne/dsh-sbx-kit:latest` with
+Then edit `spec.yaml` and replace `ghcr.io/jlugagne/dsh-sbx-kit:latest` with
 your actual tag.
 
 ## 2. Set up your DeepSeek API key
@@ -99,5 +99,5 @@ choose to install one yourself.
 - No `testdata/tck.yaml` is included — that fixture is only needed if
   you're contributing this kit upstream to `docker/sbx-kits-contrib`'s own
   test suite, not for using it on your own.
-- `sandbox.image` currently has a placeholder (`docker.io/JLugagne/...`) —
-  the kit won't resolve until you build, push, and update that field.
+- `sandbox.image` points at `ghcr.io/jlugagne/dsh-sbx-kit:latest`, published
+  by this repo's `build-dsh.yml` workflow.
