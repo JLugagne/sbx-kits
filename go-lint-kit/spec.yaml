@@ -52,6 +52,10 @@ commands:
       user: "1000"
       description: "Install go-arch-lint"
 
-    - command: "npm install -g diffity"
+    - command: "curl -fsSL https://raw.githubusercontent.com/JLugagne/go-surgeon/main/install.sh | sh"
       user: "1000"
-      description: "Install diffity (diff viewer / code review tool)"
+      description: "Install go-surgeon"
+
+    - command: "go install github.com/JLugagne/fmpath@latest"
+      user: "1000"
+      description: "Install fmpath"
