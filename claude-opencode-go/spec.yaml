@@ -1,0 +1,52 @@
+schemaVersion: "2"
+kind: mixin
+name: claude-opencode-go
+# Reroutes the built-in claude agent's Anthropic API calls to OpenCode Go's
+# Anthropic-compatible endpoint. Only meaningful on the claude base agent:
+# the ANTHROPIC_* variables mean nothing to another agent.
+requires:
+  agent: claude
+displayName: Claude Code (OpenCode Go)
+description: Route Claude Code's Anthropic API calls to the OpenCode Go subscription gateway at opencode.ai/zen/go.
+
+credentials:
+  # One service: the OpenCode Go API key. The key stays on the host; the
+  # sandbox only ever sees the "proxy-managed" sentinel, which the proxy
+  # swaps for the real value on requests to opencode.ai.
+  - service: opencode-go
+    description: "OpenCode Go API key, used by Claude Code for model calls"
+    apiKey:
+      # Claude Code reads ANTHROPIC_API_KEY and sends it as x-api-key.
+      name: ANTHROPIC_API_KEY
+      proxyManaged: true
+      inject:
+        - domain: opencode.ai
+          header: x-api-key
+          format: "%s"
+
+permissions:
+  network:
+    allow:
+      # Every request this mixin reroutes goes here. The claude base agent
+      # already allows its own hosts (api.anthropic.com, claude.ai, …); this
+      # entry adds the Go gateway.
+      - opencode.ai
+
+environment:
+  variables:
+    # No trailing slash: the Anthropic SDK appends /v1/messages, and
+    # https://opencode.ai/zen/go//v1/messages answers 404.
+    ANTHROPIC_BASE_URL: "https://opencode.ai/zen/go"
+    # Cleared explicitly so a value inherited from the host cannot shadow the
+    # API-key path: Claude Code prefers ANTHROPIC_AUTH_TOKEN over
+    # ANTHROPIC_API_KEY when it is set.
+    ANTHROPIC_AUTH_TOKEN: ""
+    # Pin every Claude Code model alias to the same OpenCode Go model so the
+    # default Sonnet/Opus/Haiku/sub-agent picks all land on minimax-m3.
+    # Edit the anchored value below to switch models. Only Go models served
+    # on /v1/messages work here: claude-haiku-5-5, minimax-m3, minimax-m2.7,
+    # qwen3.8-max, qwen3.8-flash, qwen3.7-plus.
+    ANTHROPIC_DEFAULT_OPUS_MODEL: &model "minimax-m3"
+    ANTHROPIC_DEFAULT_SONNET_MODEL: *model
+    ANTHROPIC_DEFAULT_HAIKU_MODEL: *model
+    CLAUDE_CODE_SUBAGENT_MODEL: *model
