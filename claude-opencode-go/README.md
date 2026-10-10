@@ -32,7 +32,7 @@ sbx run --kit ./claude-opencode-go claude
 From a Git repo, once pushed:
 
 ```bash
-sbx run --kit "git+https://github.com/JLugagne/sbx-kit.git#dir=claude-opencode-go" claude
+sbx run --kit "git+https://github.com/JLugagne/sbx-kits.git#dir=claude-opencode-go" claude
 ```
 
 ## What the mixin sets
